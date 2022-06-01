@@ -1,13 +1,16 @@
+const createError = require("http-errors");
 const express = require("express");
 const router = express.Router();
-const auth = require('../middleware/auth');
+const auth = require("../middleware/auth");
 
 // TODO: add email column, then use it below
 
 router.get("/", auth, async (req, res, next) => {
   const result = await req.client.query({
     text: `
-        select * from summaries limit ${req.query.from || 0}, ${req.query.count || 20}`,
+        select * from summaries limit ${req.query.from || 0}, ${
+      req.query.count || 20
+    }`,
   });
   let summaries = result.rows;
   for (let i = 0; i < summaries.length; i++) {
@@ -62,7 +65,8 @@ router.get("/:article_url", async (req, res, next) => {
   });
   const summary = result.rows[0];
   const result2 = await req.client.query({
-    text: `select value from snippets where summary_id = ${summary.id}`,
+    text: "select value from snippets where summary_id = $1::integer",
+    values: [summary.id],
   });
   const snippets = result2.rows;
   req.client.end();
@@ -72,39 +76,52 @@ router.get("/:article_url", async (req, res, next) => {
   });
 });
 
-router.post("/", (req, res, next) => {
+router.post("/", (req, res, next) =>
   req.client
     .query({
-      text: "insert into summaries (url, title, snippets) values($1::text, $2::text, $3::text, $4::json) returning *",
-      values: [
-        req.body.summary.url,
-        req.body.summary.title,
-        req.body.summary.snippets,
-      ],
+      text: "insert into summaries (url, title) values($1::text, $2::text, $3::text) returning *",
+      values: [req.body.url, req.body.title],
     })
     .then((result) => {
       const newSummary = result.rows[0];
-      req.client.end();
-      return res.json(newSummary);
-    });
-});
-
-router.put("/:article_url", (req, res, next) =>
-  req.client
-    .query({
-      text: "update summaries set email = $1::text, url = $2::text, title = $3::text, snippets = $4::json where id=$5::bigint",
-      values: [
-        req.body.email,
-        job.body.summary.url,
-        job.body.summary.title,
-        job.body.summary.snippets,
-        req.body.summary.id,
-      ],
-    })
-    .then(() => {
-      req.client.end();
-      res.sendStatus(200);
+      return Promise.all(
+        req.body.snippets.map((newSnippet) =>
+          req.client.query({
+            text: "insert into snippets (summary_id, value) values($1::integer, $2::text)",
+            values: [newSummary.id, newSnippet.value],
+          })
+        )
+      ).then(() => {
+        req.client.end();
+        return res.json(newSummary);
+      });
     })
 );
+
+router.put("/:article_id", (req, res, next) => {
+  if (req.params.article_id == req.body.id) {
+    return req.client
+      .query({
+        text: "update summaries set url = $1::text, title = $2::text where id=$3::bigint returning *",
+        values: [req.body.url, req.body.title, req.params.article_id],
+      })
+      .then((result) => {
+        const summary = result.rows[0];
+        return Promise.all(
+          req.body.snippets.map((newSnippet) =>
+            req.client.query({
+              text: "insert into snippets (summary_id, value) values ($1::integer, $2::text) on conflict do nothing",
+              values: [summary.id, newSnippet.value],
+            })
+          )
+        ).then(() => {
+          req.client.end();
+          res.sendStatus(200);
+        });
+      });
+  } else {
+    next(createError(400, `${req.params.article_id} != ${req.body.id}`));
+  }
+});
 
 module.exports = router;
