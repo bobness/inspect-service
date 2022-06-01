@@ -3,25 +3,27 @@ const createError = require("http-errors");
 const express = require("express");
 const path = require("path");
 const { Client } = require("pg");
+const dotenv = require('dotenv');
+const jwt = require('jsonwebtoken');
 
 const indexRouter = require("./routes/index");
 const usersRouter = require("./routes/users");
 const summariesRouter = require("./routes/summaries");
 
 const app = express();
+dotenv.config();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, "public")));
 
 app.use(async (req, res, next) => {
-  // TODO: store secrets somewhere secure
   const client = new Client({
-    user: "postgres",
-    password: "p4ssw0rd",
-    host: "localhost",
-    port: 5432,
-    database: "inspect",
+    user: process.env.DATABASE_USER,
+    password: process.env.DATABASE_PASSWORD,
+    host: process.env.DATABASE_HOST,
+    port: process.env.DATABASE_PORT,
+    database: process.env.DATABASE_NAME,
   });
   console.log("*** connecting to postgres client...");
   await client.connect();

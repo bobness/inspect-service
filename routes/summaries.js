@@ -1,12 +1,61 @@
 const express = require("express");
 const router = express.Router();
+const auth = require('../middleware/auth');
+
+// TODO: add email column, then use it below
+
+router.get("/", auth, async (req, res, next) => {
+  const result = await req.client.query({
+    text: `
+        select * from summaries limit ${req.query.from || 0}, ${req.query.count || 20}`,
+  });
+  let summaries = result.rows;
+  for (let i = 0; i < summaries.length; i++) {
+    const result2 = await req.client.query({
+      text: `select value from snippets where summary_id = ${summary.id}`,
+    });
+    summaries[i].snippets = result2.rows;
+  }
+  req.client.end();
+  return res.json(snippets);
+});
+
+router.get("/:article_id", async (req, res, next) => {
+  const result = await req.client.query({
+    text: `
+        select * from summaries where id = '${decodeURIComponent(
+          req.params.article_id
+        )}'
+        `,
+  });
+  const summary = result.rows[0];
+  const result2 = await req.client.query({
+    text: `select value from snippets where summary_id = ${summary.id}`,
+  });
+  const snippets = result2.rows;
+  const result3 = await req.client.query({
+    text: `select value from comments where summary_id = ${summary.id}`,
+  });
+  const comments = result3.rows;
+  const result4 = await req.client.query({
+    text: `select value from reactions where summary_id = ${summary.id}`,
+  });
+  const reactions = result4.rows;
+  req.client.end();
+  return res.json({
+    ...summary,
+    snippets,
+    comments,
+    reactions,
+  });
+});
 
 // TODO: add email column, then use it below
 
 router.get("/:article_url", async (req, res, next) => {
   const result = await req.client.query({
     text: `
-        select * from summaries where url = '${decodeURIComponent(
+        select * from summaries  where url = '${decodeURIComponent(
           req.params.article_url
         )}'
         `,
