@@ -69,6 +69,22 @@ COPY public.summaries (id, url, title) FROM stdin;
 
 
 --
+-- Name: snippets unique_snippets; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.snippets
+    ADD CONSTRAINT unique_snippets UNIQUE (summary_id, value);
+
+
+--
+-- Name: summaries unique_urls; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.summaries
+    ADD CONSTRAINT unique_urls UNIQUE (url);
+
+
+--
 -- PostgreSQL database dump complete
 --
 
