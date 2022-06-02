@@ -2,8 +2,6 @@ const express = require("express");
 const router = express.Router();
 const auth = require('../middleware/auth');
 
-// TODO: add email column, then use it below
-
 router.get("/", auth, async (req, res, next) => {
   const result = await req.client.query({
     text: `

@@ -9,6 +9,8 @@ const jwt = require('jsonwebtoken');
 const indexRouter = require("./routes/index");
 const usersRouter = require("./routes/users");
 const summariesRouter = require("./routes/summaries");
+const commentsRouter = require("./routes/comments");
+const reactionsRouter = require("./routes/reactions");
 
 const app = express();
 dotenv.config();
@@ -35,6 +37,8 @@ app.use(async (req, res, next) => {
 app.use("/", indexRouter);
 app.use("/users", usersRouter);
 app.use("/summaries", summariesRouter);
+app.use("/comments", commentsRouter);
+app.use("/reactions", reactionsRouter);
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => {
