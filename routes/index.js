@@ -12,7 +12,7 @@ router.post("/register", async (req, res) => {
 
         // Validate user input
         if (!(email && password && username)) {
-            res.status(400).send("All input is required");
+            res.status(200).send({ message: "All input is required", code: 400 });
         }
 
         // check if user already exist
@@ -20,7 +20,7 @@ router.post("/register", async (req, res) => {
         const oldUser = await req.client.query("SELECT * FROM users WHERE email=" + email).rows[0];
 
         if (oldUser) {
-            return res.status(409).send("User Already Exist. Please Login");
+            return res.status(200).send({ message: "User Already Exist. Please Login", code: 400 });
         }
 
         //Encrypt user password
@@ -56,7 +56,7 @@ router.post("/login", async (req, res) => {
 
         // Validate user input
         if (!(email && password)) {
-            res.status(400).send("All input is required");
+            res.status(200).send({ message: "All input is required", code: 400 });
         }
         // Validate if user exist in our database
         const user = await req.client.query("SELECT * FROM users WHERE email=" + email).rows[0];
@@ -70,7 +70,6 @@ router.post("/login", async (req, res) => {
                     expiresIn: "2h",
                 }
             );
-
             // save user token
             user.token = token;
 
