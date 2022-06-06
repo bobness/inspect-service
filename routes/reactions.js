@@ -11,7 +11,7 @@ router.post('/', auth, function(req, res, next) {
         req.body.summary_id,
         req.body.snippet_id,
         req.body.reaction,
-        req.body.user_id ?? req.user.id,
+        req.body.user_id ?? req.user.user_id,
         req.body.created_at ?? new Date(),
       ],
     })

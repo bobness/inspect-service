@@ -6,27 +6,26 @@ const auth = require("../middleware/auth");
 router.get("/", auth, async (req, res, next) => {
   const result = await req.client.query({
     text: `
-        select * from summaries limit ${req.query.from || 0}, ${
-      req.query.count || 20
-    }`,
+        select * from summaries limit ${req.query.count || 20} offset ${req.query.from || 0}`,
   });
   let summaries = result.rows;
   for (let i = 0; i < summaries.length; i++) {
+    const summary = summaries[i];
     const result2 = await req.client.query({
       text: `select value from snippets where summary_id = ${summary.id}`,
     });
     summaries[i].snippets = result2.rows;
   }
   req.client.end();
-  return res.json(snippets);
+  return res.json(summaries);
 });
 
-router.get("/:article_id", async (req, res, next) => {
+router.get("/id/:article_id", async (req, res, next) => {
   const result = await req.client.query({
     text: `
         select * from summaries where id = '${decodeURIComponent(
-          req.params.article_id
-        )}'
+      req.params.article_id
+    )}'
         `,
   });
   const summary = result.rows[0];
@@ -35,11 +34,11 @@ router.get("/:article_id", async (req, res, next) => {
   });
   const snippets = result2.rows;
   const result3 = await req.client.query({
-    text: `select value from comments where summary_id = ${summary.id}`,
+    text: `select * from comments where summary_id = ${summary.id}`,
   });
   const comments = result3.rows;
   const result4 = await req.client.query({
-    text: `select value from reactions where summary_id = ${summary.id}`,
+    text: `select * from reactions where summary_id = ${summary.id}`,
   });
   const reactions = result4.rows;
   req.client.end();
@@ -57,8 +56,8 @@ router.get("/:article_url", async (req, res, next) => {
   const result = await req.client.query({
     text: `
         select * from summaries  where url = '${decodeURIComponent(
-          req.params.article_url
-        )}'
+      req.params.article_url
+    )}'
         `,
   });
   const summary = result.rows[0];

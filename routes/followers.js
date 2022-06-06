@@ -7,7 +7,7 @@ router.get('/current', auth, function(req, res, next) {
   req.client
     .query({
       text: "select * from followers where user_id=$1",
-      values: [ req.user.id ],
+      values: [ req.user.user_id ],
     })
     .then((result) => {
       const followers = result.rows;
@@ -22,7 +22,7 @@ router.post('/', auth, function(req, res, next) {
     .query({
       text: "insert into followers (user_id, follower_id, created_at) values($1::numeric, $2::numeric, $3::date) returning *",
       values: [
-        req.body.user_id ?? req.user.id,
+        req.body.user_id ?? req.user.user_id,
         req.body.follower_id,
         req.body.created_at ?? new Date(),
       ],
