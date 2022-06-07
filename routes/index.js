@@ -12,7 +12,7 @@ router.post("/register", async (req, res) => {
 
         // Validate user input
         if (!(email && password && username)) {
-            res.status(200).send({ message: "All input is required", code: 400 });
+            return res.status(200).send({ message: "All input is required", code: 400 });
         }
 
         // check if user already exist
@@ -54,7 +54,7 @@ router.post("/login", async (req, res) => {
 
         // Validate user input
         if (!(email && password)) {
-            res.status(200).send({ message: "All input is required", code: 400 });
+            return res.status(200).send({ message: "All input is required", code: 400 });
         }
         // Validate if user exist in our database
         const result = await req.client.query("SELECT * FROM users WHERE email='" + email + "'");
@@ -76,16 +76,16 @@ router.post("/login", async (req, res) => {
             user.token = token;
 
             // user
-            res.status(200).json(user);
+            return res.status(200).json(user);
         }
-        res.status(400).send("Invalid Credentials");
+        res.status(200).send({ message: "Invalid Credentials", code: 400 });
     } catch (err) {
         console.log(err);
     }
     // Our login logic ends here
 });
 
-router.post("/search", auth, async (req, res) => {
+router.get("/search", auth, async (req, res) => {
     const users = await req.client.query("SELECT * FROM users WHERE (email LIKE '%" + req.query.keyword + "%' OR username LIKE '%" + req.query.keyword + "%')");
     const summaries = await req.client.query("SELECT * FROM summaries WHERE (url LIKE '%" + req.query.keyword + "%' OR title LIKE '%" + req.query.keyword + "%')");
     res.status(200).json({ users: users.rows, summaries: summaries.rows });
