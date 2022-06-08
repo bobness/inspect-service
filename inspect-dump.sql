@@ -50,6 +50,19 @@ CREATE TABLE public.comments (
 
 ALTER TABLE public.comments OWNER TO postgres;
 
+--
+-- Name: comments_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public.comments ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY (
+    SEQUENCE NAME public.comments_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
 
 --
 -- Name: followers; Type: TABLE; Schema: public; Owner: postgres
@@ -64,6 +77,19 @@ CREATE TABLE public.followers (
 
 
 ALTER TABLE public.followers OWNER TO postgres;
+
+--
+-- Name: followers_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public.followers ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY (
+    SEQUENCE NAME public.followers_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
 
 
 --
@@ -82,6 +108,19 @@ CREATE TABLE public.reactions (
 
 ALTER TABLE public.reactions OWNER TO postgres;
 
+--
+-- Name: reactions_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public.reactions ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY (
+    SEQUENCE NAME public.reactions_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
 
 --
 -- Name: snippets; Type: TABLE; Schema: public; Owner: postgres
@@ -95,6 +134,19 @@ CREATE TABLE public.snippets (
 
 
 ALTER TABLE public.snippets OWNER TO postgres;
+
+--
+-- Name: snippets_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public.snippets ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY (
+    SEQUENCE NAME public.snippets_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
 
 
 --
@@ -114,6 +166,20 @@ CREATE TABLE public.summaries (
 ALTER TABLE public.summaries OWNER TO postgres;
 
 --
+-- Name: summaries_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public.summaries ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY (
+    SEQUENCE NAME public.summaries_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
+
+
+--
 -- Name: users; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -127,6 +193,19 @@ CREATE TABLE public.users (
 
 
 ALTER TABLE public.users OWNER TO postgres;
+
+--
+-- Name: users_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+ALTER TABLE public.users ALTER COLUMN id ADD GENERATED ALWAYS AS IDENTITY (
+    SEQUENCE NAME public.users_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1
+);
 
 
 --
@@ -182,6 +261,49 @@ COPY public.summaries (id, url, title, user_id, avatar_url, website_logo) FROM s
 COPY public.users (id, username, email, password, token) FROM stdin;
 1	Test	test@test.com	$2a$10$fB1rJiiA/BQI6NOQbZm.yeVRaATwrFLPuR7u6uwgybQRXzc4BFsES	\N
 \.
+
+
+--
+-- Name: comments_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.comments_id_seq', 1, false);
+
+
+--
+-- Name: followers_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.followers_id_seq', 1, false);
+
+
+--
+-- Name: reactions_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.reactions_id_seq', 1, false);
+
+
+--
+-- Name: snippets_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.snippets_id_seq', 5, true);
+
+
+--
+-- Name: summaries_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.summaries_id_seq', 1, false);
+
+
+--
+-- Name: users_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.users_id_seq', 1, false);
+
 
 --
 -- Name: comments comments_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
