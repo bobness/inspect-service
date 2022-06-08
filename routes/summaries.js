@@ -41,12 +41,21 @@ router.get("/id/:article_id", async (req, res, next) => {
     text: `select * from reactions where summary_id = ${summary.id}`,
   });
   const reactions = result4.rows;
+  
+  const authData = await req.client.query({
+    text: `select * from users where id = ${summary.user_id}`,
+  });
+  let author = null;
+  if (authData && authData.rows) {
+    author = authData.rows[0];
+  }
   req.client.end();
   return res.json({
     ...summary,
     snippets,
     comments,
     reactions,
+    author,
   });
 });
 
