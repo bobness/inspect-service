@@ -12,7 +12,7 @@ router.get("/", auth, async (req, res, next) => {
   for (let i = 0; i < summaries.length; i++) {
     const summary = summaries[i];
     const result2 = await req.client.query({
-      text: `select value from snippets where summary_id = ${summary.id}`,
+      text: `select * from snippets where summary_id = ${summary.id}`,
     });
     summaries[i].snippets = result2.rows;
   }
@@ -30,7 +30,7 @@ router.get("/id/:article_id", async (req, res, next) => {
   });
   const summary = result.rows[0];
   const result2 = await req.client.query({
-    text: `select value from snippets where summary_id = ${summary.id}`,
+    text: `select * from snippets where summary_id = ${summary.id}`,
   });
   const snippets = result2.rows;
   const result3 = await req.client.query({
