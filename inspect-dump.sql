@@ -22,12 +22,19 @@ CREATE EXTENSION IF NOT EXISTS adminpack WITH SCHEMA pg_catalog;
 
 SET default_tablespace = '';
 
+CREATE SEQUENCE comments_id_seq;
+CREATE SEQUENCE followers_id_seq;
+CREATE SEQUENCE reactions_id_seq;
+CREATE SEQUENCE summaries_id_seq;
+CREATE SEQUENCE snippets_id_seq;
+CREATE SEQUENCE users_id_seq;
+
 --
 -- Name: comments; Type: TABLE; Schema: public; Owner: postgres
 --
 
 CREATE TABLE public.comments (
-    id bigint NOT NULL,
+    id bigint NOT NULL nextval('comments_id_seq'),
     snippet_id bigint,
     comment text,
     created_at date,
@@ -43,7 +50,7 @@ ALTER TABLE public.comments OWNER TO postgres;
 --
 
 CREATE TABLE public.followers (
-    id bigint NOT NULL,
+    id bigint NOT NULL nextval('followers_id_seq'),
     follower_id bigint NOT NULL,
     user_id bigint NOT NULL,
     created_at date
@@ -58,7 +65,7 @@ ALTER TABLE public.followers OWNER TO postgres;
 --
 
 CREATE TABLE public.reactions (
-    id bigint NOT NULL,
+    id bigint NOT NULL nextval('reactions_id_seq'),
     reaction character varying(255),
     snippet_id bigint NOT NULL,
     user_id bigint NOT NULL,
@@ -74,7 +81,7 @@ ALTER TABLE public.reactions OWNER TO postgres;
 --
 
 CREATE TABLE public.snippets (
-    id integer NOT NULL,
+    id integer NOT NULL nextval('snippets_id_seq'),
     summary_id integer,
     value character varying(255)
 );
@@ -87,7 +94,7 @@ ALTER TABLE public.snippets OWNER TO postgres;
 --
 
 CREATE TABLE public.summaries (
-    id integer NOT NULL,
+    id integer NOT NULL nextval('summaries_id_seq'),
     url character varying(255),
     title character varying(255),
     user_id bigint,
@@ -104,7 +111,7 @@ ALTER TABLE public.summaries OWNER TO postgres;
 --
 
 CREATE TABLE public.users (
-    id bigint NOT NULL,
+    id bigint NOT NULL nextval('users_id_seq'),
     username character varying(255),
     email character varying(255),
     password character varying(255),

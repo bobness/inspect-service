@@ -25,8 +25,8 @@ router.post("/register", async (req, res) => {
         //Encrypt user password
         encryptedPassword = await bcrypt.hash(password, 10);
         // Create user in our database
-        const user = await req.client.query("INSERT INTO users (id, username, email, password) VALUES (" + (oldUser ? (oldUser.length + 1) : 1) + ", '" + username + "', '" + email.toLowerCase() + "', '" + encryptedPassword + "')");
-
+        await req.client.query("INSERT INTO users (id, username, email, password) VALUES (" + (oldUser ? (oldUser.length + 1) : 1) + ", '" + username + "', '" + email.toLowerCase() + "', '" + encryptedPassword + "')");
+        const user = result[0];
         // Create token
         const token = jwt.sign(
             { user_id: user.id, email, username: user.username },
