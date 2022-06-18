@@ -6,7 +6,9 @@ const auth = require("../middleware/auth");
 router.get("/", auth, async (req, res, next) => {
   const result = await req.client.query({
     text: `
-        select * from summaries limit ${req.query.count || 20} offset ${req.query.from || 0}`,
+        select * from summaries limit ${req.query.count || 20} offset ${
+      req.query.from || 0
+    }`,
   });
   let summaries = result.rows;
   for (let i = 0; i < summaries.length; i++) {
@@ -20,12 +22,38 @@ router.get("/", auth, async (req, res, next) => {
   return res.json(summaries);
 });
 
+// FIXME: invalid input syntax for type integer: "https://www.npr.org/2022/05/18/1099733752/famine-africa-ukraine-invasion-drought"
+router.post("/", (req, res, next) => {
+  console.log("*** POSTing...", req.body);
+  req.client
+    .query({
+      text: "insert into summaries (url, title) values($1::text, $2::text) returning *",
+      values: [req.body.url, req.body.title],
+    })
+    .then((result) => {
+      const newSummary = result.rows[0];
+      console.log("inserted summary; not inserting snippets");
+      console.log(req.body);
+      return Promise.all(
+        req.body.snippets.map((newSnippet) =>
+          req.client.query({
+            text: "insert into snippets (summary_id, value) values($1::integer, $2::text)",
+            values: [newSummary.id, newSnippet.value],
+          })
+        )
+      ).then(() => {
+        req.client.end();
+        return res.json(newSummary);
+      });
+    });
+});
+
 router.get("/id/:article_id", async (req, res, next) => {
   const result = await req.client.query({
     text: `
         select * from summaries where id = '${decodeURIComponent(
-      req.params.article_id
-    )}'
+          req.params.article_id
+        )}'
         `,
   });
   const summary = result.rows[0];
@@ -41,7 +69,7 @@ router.get("/id/:article_id", async (req, res, next) => {
     text: `select * from reactions where summary_id = ${summary.id}`,
   });
   const reactions = result4.rows;
-  
+
   const authData = await req.client.query({
     text: `select * from users where id = ${summary.user_id}`,
   });
@@ -59,14 +87,12 @@ router.get("/id/:article_id", async (req, res, next) => {
   });
 });
 
-// TODO: add email column, then use it below
-
 router.get("/:article_url", async (req, res, next) => {
   const result = await req.client.query({
     text: `
         select * from summaries  where url = '${decodeURIComponent(
-      req.params.article_url
-    )}'
+          req.params.article_url
+        )}'
         `,
   });
   const summary = result.rows[0];
@@ -81,28 +107,6 @@ router.get("/:article_url", async (req, res, next) => {
     snippets,
   });
 });
-
-router.post("/", (req, res, next) =>
-  req.client
-    .query({
-      text: "insert into summaries (url, title) values($1::text, $2::text, $3::text) returning *",
-      values: [req.body.url, req.body.title],
-    })
-    .then((result) => {
-      const newSummary = result.rows[0];
-      return Promise.all(
-        req.body.snippets.map((newSnippet) =>
-          req.client.query({
-            text: "insert into snippets (summary_id, value) values($1::integer, $2::text)",
-            values: [newSummary.id, newSnippet.value],
-          })
-        )
-      ).then(() => {
-        req.client.end();
-        return res.json(newSummary);
-      });
-    })
-);
 
 router.put("/:article_id", (req, res, next) => {
   if (req.params.article_id == req.body.id) {
