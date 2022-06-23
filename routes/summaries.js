@@ -5,12 +5,16 @@ const auth = require("../middleware/auth");
 
 router.get("/", auth, async (req, res, next) => {
   const result = await req.client.query({
-    text: `
-        select * from summaries limit ${req.query.count || 20} offset ${
-      req.query.from || 0
-    }`,
+    text: `select user_id from followers where follower_id = ${req.user.id}`,
   });
-  let summaries = result.rows;
+  const userIds = [req.user.id, ...result.rows].join(",");
+  const result1 = await req.client.query({
+    text: `
+        select * from summaries where user_id in (${userIds}) limit ${
+      req.query.count || 20
+    } offset ${req.query.from || 0}`,
+  });
+  let summaries = result1.rows;
   for (let i = 0; i < summaries.length; i++) {
     const summary = summaries[i];
     const result2 = await req.client.query({
