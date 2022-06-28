@@ -4,10 +4,12 @@ const router = express.Router();
 const auth = require("../middleware/auth");
 
 router.get("/", auth, async (req, res, next) => {
+  const thisId = req.user?.user_id ?? 1;
   const result = await req.client.query({
-    text: `select user_id from followers where follower_id = ${req.user.user_id}`,
+    text: `select user_id from followers where follower_id = ${thisId}`,
   });
-  const userIds = [req.user.id, ...result.rows].join(",");
+  const newIds = result.rows.map((row) => row.user_id);
+  const userIds = [thisId, ...newIds].join(",");
   const result1 = await req.client.query({
     text: `
         select * from summaries where user_id in (${userIds}) limit ${
