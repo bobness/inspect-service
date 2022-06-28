@@ -395,6 +395,7 @@ COPY public.comments (id, snippet_id, comment, created_at, user_id, summary_id) 
 --
 
 COPY public.followers (id, follower_id, user_id, created_at) FROM stdin;
+1   1   2   latest_timestamp
 \.
 
 
@@ -424,7 +425,7 @@ COPY public.snippets (id, summary_id, value) FROM stdin;
 --
 
 COPY public.summaries (id, url, title, user_id, avatar_url, website_logo) FROM stdin;
-1	https://news.yahoo.com/future-covid-variants-will-likely-reinfect-us-multiple-times-a-year-experts-say-unless-we-invest-in-new-vaccines-121959797.html	Omicron variants of COVID-19 is the source of it being endemic.	1	\N	\N
+1	https://news.yahoo.com/future-covid-variants-will-likely-reinfect-us-multiple-times-a-year-experts-say-unless-we-invest-in-new-vaccines-121959797.html	Omicron variants of COVID-19 is the source of it being endemic.	2	\N	\N
 \.
 
 

@@ -3,7 +3,7 @@ const express = require("express");
 const router = express.Router();
 const auth = require("../middleware/auth");
 
-router.get("/", auth, async (req, res, next) => {
+router.get("/", async (req, res, next) => {
   const thisId = req.user?.user_id ?? 1;
   const result = await req.client.query({
     text: `select user_id from followers where follower_id = ${thisId}`,
@@ -17,13 +17,17 @@ router.get("/", auth, async (req, res, next) => {
     } offset ${req.query.from || 0}`,
   });
   let summaries = result1.rows;
-  for (let i = 0; i < summaries.length; i++) {
-    const summary = summaries[i];
-    const result2 = await req.client.query({
-      text: `select * from snippets where summary_id = ${summary.id}`,
-    });
-    summaries[i].snippets = result2.rows;
-  }
+  await Promise.all(
+    summaries.map((summary) =>
+      req.client
+        .query({
+          text: `select * from snippets where summary_id = ${summary.id}`,
+        })
+        .then((result) => {
+          summary.snippets = result.rows;
+        })
+    )
+  );
   req.client.end();
   return res.json(summaries);
 });
