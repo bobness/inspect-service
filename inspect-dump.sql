@@ -2,16 +2,19 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 13.7
--- Dumped by pg_dump version 13.7
+-- Dumped from database version 13.4
+-- Dumped by pg_dump version 14.4
 
 SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
 SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
 SELECT pg_catalog.set_config('search_path', '', false);
 SET check_function_bodies = false;
 SET xmloption = content;
 SET client_min_messages = warning;
+SET row_security = off;
 
 --
 -- Name: adminpack; Type: EXTENSION; Schema: -; Owner: -
@@ -20,21 +23,23 @@ SET client_min_messages = warning;
 CREATE EXTENSION IF NOT EXISTS adminpack WITH SCHEMA pg_catalog;
 
 
+--
+-- Name: EXTENSION adminpack; Type: COMMENT; Schema: -; Owner: 
+--
+
+COMMENT ON EXTENSION adminpack IS 'administrative functions for PostgreSQL';
+
+
 SET default_tablespace = '';
 
-CREATE SEQUENCE comments_id_seq;
-CREATE SEQUENCE followers_id_seq;
-CREATE SEQUENCE reactions_id_seq;
-CREATE SEQUENCE summaries_id_seq;
-CREATE SEQUENCE snippets_id_seq;
-CREATE SEQUENCE users_id_seq;
+SET default_table_access_method = heap;
 
 --
--- Name: comments; Type: TABLE; Schema: public; Owner: postgres
+-- Name: comments; Type: TABLE; Schema: public; Owner: inspect
 --
 
 CREATE TABLE public.comments (
-    id bigint NOT NULL nextval('comments_id_seq'),
+    id integer NOT NULL,
     snippet_id bigint,
     comment text,
     created_at date,
@@ -43,29 +48,100 @@ CREATE TABLE public.comments (
 );
 
 
-ALTER TABLE public.comments OWNER TO postgres;
+ALTER TABLE public.comments OWNER TO inspect;
 
 --
--- Name: followers; Type: TABLE; Schema: public; Owner: postgres
+-- Name: comments_id_seq; Type: SEQUENCE; Schema: public; Owner: inspect
+--
+
+CREATE SEQUENCE public.comments_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.comments_id_seq OWNER TO inspect;
+
+--
+-- Name: comments_id_seq1; Type: SEQUENCE; Schema: public; Owner: inspect
+--
+
+CREATE SEQUENCE public.comments_id_seq1
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.comments_id_seq1 OWNER TO inspect;
+
+--
+-- Name: comments_id_seq1; Type: SEQUENCE OWNED BY; Schema: public; Owner: inspect
+--
+
+ALTER SEQUENCE public.comments_id_seq1 OWNED BY public.comments.id;
+
+
+--
+-- Name: followers; Type: TABLE; Schema: public; Owner: inspect
 --
 
 CREATE TABLE public.followers (
-    id bigint NOT NULL nextval('followers_id_seq'),
+    id integer NOT NULL,
     follower_id bigint NOT NULL,
     user_id bigint NOT NULL,
     created_at date
 );
 
 
-ALTER TABLE public.followers OWNER TO postgres;
+ALTER TABLE public.followers OWNER TO inspect;
+
+--
+-- Name: followers_id_seq; Type: SEQUENCE; Schema: public; Owner: inspect
+--
+
+CREATE SEQUENCE public.followers_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.followers_id_seq OWNER TO inspect;
+
+--
+-- Name: followers_id_seq1; Type: SEQUENCE; Schema: public; Owner: inspect
+--
+
+CREATE SEQUENCE public.followers_id_seq1
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.followers_id_seq1 OWNER TO inspect;
+
+--
+-- Name: followers_id_seq1; Type: SEQUENCE OWNED BY; Schema: public; Owner: inspect
+--
+
+ALTER SEQUENCE public.followers_id_seq1 OWNED BY public.followers.id;
 
 
 --
--- Name: reactions; Type: TABLE; Schema: public; Owner: postgres
+-- Name: reactions; Type: TABLE; Schema: public; Owner: inspect
 --
 
 CREATE TABLE public.reactions (
-    id bigint NOT NULL nextval('reactions_id_seq'),
+    id integer NOT NULL,
     reaction character varying(255),
     snippet_id bigint NOT NULL,
     user_id bigint NOT NULL,
@@ -74,27 +150,99 @@ CREATE TABLE public.reactions (
 );
 
 
-ALTER TABLE public.reactions OWNER TO postgres;
+ALTER TABLE public.reactions OWNER TO inspect;
 
 --
--- Name: snippets; Type: TABLE; Schema: public; Owner: postgres
+-- Name: reactions_id_seq; Type: SEQUENCE; Schema: public; Owner: inspect
+--
+
+CREATE SEQUENCE public.reactions_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.reactions_id_seq OWNER TO inspect;
+
+--
+-- Name: reactions_id_seq1; Type: SEQUENCE; Schema: public; Owner: inspect
+--
+
+CREATE SEQUENCE public.reactions_id_seq1
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.reactions_id_seq1 OWNER TO inspect;
+
+--
+-- Name: reactions_id_seq1; Type: SEQUENCE OWNED BY; Schema: public; Owner: inspect
+--
+
+ALTER SEQUENCE public.reactions_id_seq1 OWNED BY public.reactions.id;
+
+
+--
+-- Name: snippets; Type: TABLE; Schema: public; Owner: inspect
 --
 
 CREATE TABLE public.snippets (
-    id integer NOT NULL nextval('snippets_id_seq'),
+    id integer NOT NULL,
     summary_id integer,
     value character varying(255)
 );
 
 
-ALTER TABLE public.snippets OWNER TO postgres;
+ALTER TABLE public.snippets OWNER TO inspect;
 
 --
--- Name: summaries; Type: TABLE; Schema: public; Owner: postgres
+-- Name: snippets_id_seq; Type: SEQUENCE; Schema: public; Owner: inspect
+--
+
+CREATE SEQUENCE public.snippets_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.snippets_id_seq OWNER TO inspect;
+
+--
+-- Name: snippets_id_seq1; Type: SEQUENCE; Schema: public; Owner: inspect
+--
+
+CREATE SEQUENCE public.snippets_id_seq1
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.snippets_id_seq1 OWNER TO inspect;
+
+--
+-- Name: snippets_id_seq1; Type: SEQUENCE OWNED BY; Schema: public; Owner: inspect
+--
+
+ALTER SEQUENCE public.snippets_id_seq1 OWNED BY public.snippets.id;
+
+
+--
+-- Name: summaries; Type: TABLE; Schema: public; Owner: inspect
 --
 
 CREATE TABLE public.summaries (
-    id integer NOT NULL nextval('summaries_id_seq'),
+    id integer NOT NULL,
     url character varying(255),
     title character varying(255),
     user_id bigint,
@@ -103,15 +251,50 @@ CREATE TABLE public.summaries (
 );
 
 
-ALTER TABLE public.summaries OWNER TO postgres;
+ALTER TABLE public.summaries OWNER TO inspect;
+
+--
+-- Name: summaries_id_seq; Type: SEQUENCE; Schema: public; Owner: inspect
+--
+
+CREATE SEQUENCE public.summaries_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.summaries_id_seq OWNER TO inspect;
+
+--
+-- Name: summaries_id_seq1; Type: SEQUENCE; Schema: public; Owner: inspect
+--
+
+CREATE SEQUENCE public.summaries_id_seq1
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.summaries_id_seq1 OWNER TO inspect;
+
+--
+-- Name: summaries_id_seq1; Type: SEQUENCE OWNED BY; Schema: public; Owner: inspect
+--
+
+ALTER SEQUENCE public.summaries_id_seq1 OWNED BY public.summaries.id;
 
 
 --
--- Name: users; Type: TABLE; Schema: public; Owner: postgres
+-- Name: users; Type: TABLE; Schema: public; Owner: inspect
 --
 
 CREATE TABLE public.users (
-    id bigint NOT NULL nextval('users_id_seq'),
+    id integer NOT NULL,
     username character varying(255),
     email character varying(255),
     password character varying(255),
@@ -119,11 +302,88 @@ CREATE TABLE public.users (
 );
 
 
-ALTER TABLE public.users OWNER TO postgres;
+ALTER TABLE public.users OWNER TO inspect;
+
+--
+-- Name: users_id_seq; Type: SEQUENCE; Schema: public; Owner: inspect
+--
+
+CREATE SEQUENCE public.users_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.users_id_seq OWNER TO inspect;
+
+--
+-- Name: users_id_seq1; Type: SEQUENCE; Schema: public; Owner: inspect
+--
+
+CREATE SEQUENCE public.users_id_seq1
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.users_id_seq1 OWNER TO inspect;
+
+--
+-- Name: users_id_seq1; Type: SEQUENCE OWNED BY; Schema: public; Owner: inspect
+--
+
+ALTER SEQUENCE public.users_id_seq1 OWNED BY public.users.id;
 
 
 --
--- Data for Name: comments; Type: TABLE DATA; Schema: public; Owner: postgres
+-- Name: comments id; Type: DEFAULT; Schema: public; Owner: inspect
+--
+
+ALTER TABLE ONLY public.comments ALTER COLUMN id SET DEFAULT nextval('public.comments_id_seq1'::regclass);
+
+
+--
+-- Name: followers id; Type: DEFAULT; Schema: public; Owner: inspect
+--
+
+ALTER TABLE ONLY public.followers ALTER COLUMN id SET DEFAULT nextval('public.followers_id_seq1'::regclass);
+
+
+--
+-- Name: reactions id; Type: DEFAULT; Schema: public; Owner: inspect
+--
+
+ALTER TABLE ONLY public.reactions ALTER COLUMN id SET DEFAULT nextval('public.reactions_id_seq1'::regclass);
+
+
+--
+-- Name: snippets id; Type: DEFAULT; Schema: public; Owner: inspect
+--
+
+ALTER TABLE ONLY public.snippets ALTER COLUMN id SET DEFAULT nextval('public.snippets_id_seq1'::regclass);
+
+
+--
+-- Name: summaries id; Type: DEFAULT; Schema: public; Owner: inspect
+--
+
+ALTER TABLE ONLY public.summaries ALTER COLUMN id SET DEFAULT nextval('public.summaries_id_seq1'::regclass);
+
+
+--
+-- Name: users id; Type: DEFAULT; Schema: public; Owner: inspect
+--
+
+ALTER TABLE ONLY public.users ALTER COLUMN id SET DEFAULT nextval('public.users_id_seq1'::regclass);
+
+
+--
+-- Data for Name: comments; Type: TABLE DATA; Schema: public; Owner: inspect
 --
 
 COPY public.comments (id, snippet_id, comment, created_at, user_id, summary_id) FROM stdin;
@@ -131,7 +391,7 @@ COPY public.comments (id, snippet_id, comment, created_at, user_id, summary_id) 
 
 
 --
--- Data for Name: followers; Type: TABLE DATA; Schema: public; Owner: postgres
+-- Data for Name: followers; Type: TABLE DATA; Schema: public; Owner: inspect
 --
 
 COPY public.followers (id, follower_id, user_id, created_at) FROM stdin;
@@ -139,7 +399,7 @@ COPY public.followers (id, follower_id, user_id, created_at) FROM stdin;
 
 
 --
--- Data for Name: reactions; Type: TABLE DATA; Schema: public; Owner: postgres
+-- Data for Name: reactions; Type: TABLE DATA; Schema: public; Owner: inspect
 --
 
 COPY public.reactions (id, reaction, snippet_id, user_id, created_at, summary_id) FROM stdin;
@@ -147,7 +407,7 @@ COPY public.reactions (id, reaction, snippet_id, user_id, created_at, summary_id
 
 
 --
--- Data for Name: snippets; Type: TABLE DATA; Schema: public; Owner: postgres
+-- Data for Name: snippets; Type: TABLE DATA; Schema: public; Owner: inspect
 --
 
 COPY public.snippets (id, summary_id, value) FROM stdin;
@@ -160,7 +420,7 @@ COPY public.snippets (id, summary_id, value) FROM stdin;
 
 
 --
--- Data for Name: summaries; Type: TABLE DATA; Schema: public; Owner: postgres
+-- Data for Name: summaries; Type: TABLE DATA; Schema: public; Owner: inspect
 --
 
 COPY public.summaries (id, url, title, user_id, avatar_url, website_logo) FROM stdin;
@@ -169,58 +429,101 @@ COPY public.summaries (id, url, title, user_id, avatar_url, website_logo) FROM s
 
 
 --
--- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: postgres
+-- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: inspect
 --
 
 COPY public.users (id, username, email, password, token) FROM stdin;
 1	Test	test@test.com	$2a$10$fB1rJiiA/BQI6NOQbZm.yeVRaATwrFLPuR7u6uwgybQRXzc4BFsES	\N
+2	Bob	bob@datagotchi.net	$2y$10$Sk1WeAu.J1Q33clthhaITu3rfy5gbLCpPmUoBfltKAsTsYVgrVfPG	\N
 \.
 
 
 --
--- Name: comments_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+-- Name: comments_id_seq; Type: SEQUENCE SET; Schema: public; Owner: inspect
 --
 
 SELECT pg_catalog.setval('public.comments_id_seq', 1, false);
 
 
 --
--- Name: followers_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+-- Name: comments_id_seq1; Type: SEQUENCE SET; Schema: public; Owner: inspect
+--
+
+SELECT pg_catalog.setval('public.comments_id_seq1', 1, false);
+
+
+--
+-- Name: followers_id_seq; Type: SEQUENCE SET; Schema: public; Owner: inspect
 --
 
 SELECT pg_catalog.setval('public.followers_id_seq', 1, false);
 
 
 --
--- Name: reactions_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+-- Name: followers_id_seq1; Type: SEQUENCE SET; Schema: public; Owner: inspect
+--
+
+SELECT pg_catalog.setval('public.followers_id_seq1', 1, false);
+
+
+--
+-- Name: reactions_id_seq; Type: SEQUENCE SET; Schema: public; Owner: inspect
 --
 
 SELECT pg_catalog.setval('public.reactions_id_seq', 1, false);
 
 
 --
--- Name: snippets_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+-- Name: reactions_id_seq1; Type: SEQUENCE SET; Schema: public; Owner: inspect
+--
+
+SELECT pg_catalog.setval('public.reactions_id_seq1', 1, false);
+
+
+--
+-- Name: snippets_id_seq; Type: SEQUENCE SET; Schema: public; Owner: inspect
 --
 
 SELECT pg_catalog.setval('public.snippets_id_seq', 5, true);
 
 
 --
--- Name: summaries_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+-- Name: snippets_id_seq1; Type: SEQUENCE SET; Schema: public; Owner: inspect
+--
+
+SELECT pg_catalog.setval('public.snippets_id_seq1', 1, false);
+
+
+--
+-- Name: summaries_id_seq; Type: SEQUENCE SET; Schema: public; Owner: inspect
 --
 
 SELECT pg_catalog.setval('public.summaries_id_seq', 1, false);
 
 
 --
--- Name: users_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+-- Name: summaries_id_seq1; Type: SEQUENCE SET; Schema: public; Owner: inspect
 --
 
-SELECT pg_catalog.setval('public.users_id_seq', 1, false);
+SELECT pg_catalog.setval('public.summaries_id_seq1', 1, false);
 
 
 --
--- Name: comments comments_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: users_id_seq; Type: SEQUENCE SET; Schema: public; Owner: inspect
+--
+
+SELECT pg_catalog.setval('public.users_id_seq', 2, false);
+
+
+--
+-- Name: users_id_seq1; Type: SEQUENCE SET; Schema: public; Owner: inspect
+--
+
+SELECT pg_catalog.setval('public.users_id_seq1', 2, true);
+
+
+--
+-- Name: comments comments_pkey; Type: CONSTRAINT; Schema: public; Owner: inspect
 --
 
 ALTER TABLE ONLY public.comments
@@ -228,7 +531,7 @@ ALTER TABLE ONLY public.comments
 
 
 --
--- Name: followers followers_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: followers followers_pkey; Type: CONSTRAINT; Schema: public; Owner: inspect
 --
 
 ALTER TABLE ONLY public.followers
@@ -236,7 +539,7 @@ ALTER TABLE ONLY public.followers
 
 
 --
--- Name: reactions reactions_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: reactions reactions_pkey; Type: CONSTRAINT; Schema: public; Owner: inspect
 --
 
 ALTER TABLE ONLY public.reactions
@@ -244,7 +547,7 @@ ALTER TABLE ONLY public.reactions
 
 
 --
--- Name: snippets snippets_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: snippets snippets_pkey; Type: CONSTRAINT; Schema: public; Owner: inspect
 --
 
 ALTER TABLE ONLY public.snippets
@@ -252,7 +555,7 @@ ALTER TABLE ONLY public.snippets
 
 
 --
--- Name: summaries summaries_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: summaries summaries_pkey; Type: CONSTRAINT; Schema: public; Owner: inspect
 --
 
 ALTER TABLE ONLY public.summaries
@@ -260,7 +563,7 @@ ALTER TABLE ONLY public.summaries
 
 
 --
--- Name: users users_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: users users_pkey; Type: CONSTRAINT; Schema: public; Owner: inspect
 --
 
 ALTER TABLE ONLY public.users
