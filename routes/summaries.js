@@ -5,7 +5,7 @@ const auth = require("../middleware/auth");
 
 router.get("/", auth, async (req, res, next) => {
   const result = await req.client.query({
-    text: `select user_id from followers where follower_id = ${req.user.id}`,
+    text: `select user_id from followers where follower_id = ${req.user.user_id}`,
   });
   const userIds = [req.user.id, ...result.rows].join(",");
   const result1 = await req.client.query({
