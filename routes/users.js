@@ -3,32 +3,27 @@ var router = express.Router();
 const auth = require("../middleware/auth");
 const bcrypt = require("bcryptjs");
 
-// const imageTo64 = async (url) => {
-//   const blob = await fetch(url).then((response) => response.blob());
-//   const reader = new FileReader();
-//   return new Promise((resolve, reject) => {
-//     reader.onloadend = () => resolve(reader.result);
-//     reader.onerror = reject;
-//     reader.readAsDataURL(blob);
-//   });
-// };
-
 /* GET authenticated user. */
 router.get("/", auth, async function (req, res, next) {
-  const userObject = await req.client.query(
-    "SElECT * FROM users WHERE id = " + req.authUser.user_id
-  );
-  const baseUser = { ...req.authUser, userObject };
-  // baseUser.avatar = await imageTo64(baseUser.avatar_url);
-  const followers = await req.client.query(
-    "SELECT * FROM followers WHERE user_id=" + req.authUser.user_id
-  );
-  const summaries = await req.client.query(
-    "SELECT * FROM summaries WHERE user_id=" + req.authUser.user_id
-  );
-  baseUser.followers = followers.rows;
-  baseUser.summaries = summaries.rows;
-  res.send(baseUser);
+  try {
+    const result = await req.client.query(
+      "SElECT * FROM users WHERE id = " + req.authUser.user_id
+    );
+    const baseUser = result.rows[0];
+    const followers = await req.client.query(
+      "SELECT * FROM followers WHERE user_id=" + req.authUser.user_id
+    );
+    const summaries = await req.client.query(
+      "SELECT * FROM summaries WHERE user_id=" + req.authUser.user_id
+    );
+    res.send({
+      ...baseUser,
+      followers: followers.rows,
+      summaries: summaries.rows,
+    });
+  } catch (err) {
+    next(err);
+  }
 });
 
 /* GET user information by Id. */
@@ -50,29 +45,23 @@ router.get("/:user_id", auth, async function (req, res, next) {
 
 /* PUT authenticated user. */
 router.put("/", auth, async function (req, res, next) {
-  // Get user input
-  const { username, email, password } = req.body;
-  encryptedPassword = await bcrypt.hash(password, 10);
-  // Create user in our database
-  await req.client.query(
-    "UPDATE users SET username='" +
-      username +
-      "', email='" +
-      email.toLowerCase() +
-      "', password='" +
-      encryptedPassword +
-      "' WHERE id=" +
-      req.authUser.user_id
+  await Promise.all(
+    Object.keys(req.body).map(async (attribute) => {
+      let value = String(req.body[attribute]);
+      if (attribute === "email") {
+        value = value.toLowerCase();
+      } else if (attribute === "password") {
+        value = await bcrypt.hash(value, 10);
+      }
+      // console.log(`*** updating ${attribute} to ${value}`);
+      return req.client.query(
+        `UPDATE users SET ${attribute}='${value}'
+        WHERE id=${req.authUser.user_id}`
+      );
+    })
   );
-  const followers = await req.client.query(
-    "SELECT * FROM followers WHERE user_id=" + req.authUser.user_id
-  );
-  const summaries = await req.client.query(
-    "SELECT * FROM summaries WHERE user_id=" + req.authUser.user_id
-  );
-  req.authUser.followers = followers.rows;
-  req.authUser.summaries = summaries.rows;
-  res.send(req.authUser);
+  req.client.end();
+  res.sendStatus(200);
 });
 
 module.exports = router;
