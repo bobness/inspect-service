@@ -3,8 +3,18 @@ const express = require("express");
 const router = express.Router();
 const auth = require("../middleware/auth");
 
-router.get("/", async (req, res, next) => {
-  const thisId = req.user?.user_id ?? 1;
+const imageTo64 = async (url) => {
+  const blob = await fetch(url).then((response) => response.blob());
+  const reader = new FileReader();
+  return new Promise((resolve, reject) => {
+    reader.onloadend = () => resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
+};
+
+router.get("/", auth, async (req, res, next) => {
+  const thisId = req.authUser?.user_id ?? 1;
   const result = await req.client.query({
     text: `select user_id from followers where follower_id = ${thisId}`,
   });
@@ -16,7 +26,9 @@ router.get("/", async (req, res, next) => {
       req.query.count || 20
     } offset ${req.query.from || 0}`,
   });
-  let summaries = result1.rows;
+  let summaries = await Promise.all(
+    result1.rows.map((row) => (row.avatar = imageTo64(row.avatar_url)))
+  );
   await Promise.all(
     summaries.map((summary) =>
       req.client

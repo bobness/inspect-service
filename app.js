@@ -27,9 +27,7 @@ app.use(async (req, res, next) => {
     port: process.env.DATABASE_PORT,
     database: process.env.DATABASE_NAME,
   });
-  console.log("*** connecting to postgres client...");
   await client.connect();
-  console.log("*** postgres client connected");
   req.client = client;
   next();
 });
