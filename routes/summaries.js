@@ -2,15 +2,7 @@ const createError = require("http-errors");
 const express = require("express");
 const router = express.Router();
 const auth = require("../middleware/auth");
-
-const getUserAvatar = async (req, user_id) => {
-  const results = await req.client.query({
-    text: `select avatar_uri from users where id = ${user_id}`,
-  });
-  if (results.rows.length > 0) {
-    return results.rows[0].avatar_uri;
-  }
-};
+const { getSourceData, getUserData } = require("../middleware/functions");
 
 router.get("/", auth, async (req, res, next) => {
   const thisId = req.authUser?.user_id ?? 1;
@@ -28,8 +20,15 @@ router.get("/", auth, async (req, res, next) => {
   let summaries = result1.rows;
   await Promise.all(
     summaries.map((summary) =>
-      getUserAvatar(req, summary.user_id).then((avatar_uri) => {
+      getUserData(req, summary.user_id, "avatar_uri").then(([avatar_uri]) => {
         summary.avatar_uri = avatar_uri;
+      })
+    )
+  );
+  await Promise.all(
+    summaries.map((summary) =>
+      getSourceData(req, summary.source_id, "logo_uri").then(([logo_uri]) => {
+        summary.logo_uri = logo_uri;
       })
     )
   );
@@ -83,7 +82,7 @@ router.get("/id/:article_id", async (req, res, next) => {
         `,
   });
   const summary = result.rows[0];
-  summary.avatar_uri = await getUserAvatar(req, summary.user_id);
+  [summary.avatar_uri] = await getUserData(req, summary.user_id, "avatar_uri");
   const result2 = await req.client.query({
     text: `select * from snippets where summary_id = ${summary.id}`,
   });
@@ -104,6 +103,9 @@ router.get("/id/:article_id", async (req, res, next) => {
   if (authData && authData.rows) {
     author = authData.rows[0];
   }
+  await getSourceData(req, summary.source_id, "logo_uri").then(([logo_uri]) => {
+    summary.logo_uri = logo_uri;
+  });
   req.client.end();
   return res.json({
     ...summary,
