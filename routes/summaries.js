@@ -3,14 +3,13 @@ const express = require("express");
 const router = express.Router();
 const auth = require("../middleware/auth");
 
-const imageTo64 = async (url) => {
-  const blob = await fetch(url).then((response) => response.blob());
-  const reader = new FileReader();
-  return new Promise((resolve, reject) => {
-    reader.onloadend = () => resolve(reader.result);
-    reader.onerror = reject;
-    reader.readAsDataURL(blob);
+const getUserAvatar = async (req, user_id) => {
+  const results = await req.client.query({
+    text: `select avatar_uri from users where id = ${user_id}`,
   });
+  if (results.rows.length > 0) {
+    return results.rows[0].avatar_uri;
+  }
 };
 
 router.get("/", auth, async (req, res, next) => {
@@ -26,8 +25,13 @@ router.get("/", auth, async (req, res, next) => {
       req.query.count || 20
     } offset ${req.query.from || 0}`,
   });
-  let summaries = await Promise.all(
-    result1.rows.map((row) => (row.avatar = imageTo64(row.avatar_url)))
+  let summaries = result1.rows;
+  await Promise.all(
+    summaries.map((summary) =>
+      getUserAvatar(req, summary.user_id).then((avatar_uri) => {
+        summary.avatar_uri = avatar_uri;
+      })
+    )
   );
   await Promise.all(
     summaries.map((summary) =>
@@ -79,6 +83,7 @@ router.get("/id/:article_id", async (req, res, next) => {
         `,
   });
   const summary = result.rows[0];
+  summary.avatar_uri = await getUserAvatar(req, summary.user_id);
   const result2 = await req.client.query({
     text: `select * from snippets where summary_id = ${summary.id}`,
   });
